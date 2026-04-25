@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Keto_Tracker2.ViewModels"
+    xmlns:conv="clr-namespace:Keto_Tracker2.Converters"
+    x:Class="Keto_Tracker2.Views.DayDetailPage"
+    Title="{Binding DateLabel}"
+    BackgroundColor="#1E1E2E">
+
+    <ContentPage.Resources>
+        <conv:NullableBoolToToggleColorConverter x:Key="ToggleColor" />
+        <conv:NullableBoolToToggleTextColorConverter x:Key="ToggleTextColor" />
+        <conv:InverseBoolConverter x:Key="InverseBool" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="*,Auto">
+
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="16,12" Spacing="16">
+
+                <!-- Keto Section -->
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Keto" Style="{StaticResource SectionLabel}" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <Button Grid.Column="0"
+                                    Text="&#x2713; Pass"
+                                    BackgroundColor="{Binding KetoPass, Converter={StaticResource ToggleColor}, ConverterParameter=true}"
+                                    TextColor="{Binding KetoPass, Converter={StaticResource ToggleTextColor}, ConverterParameter=true}"
+                                    Command="{Binding SetKetoPassCommand}"
+                                    CommandParameter="true"
+                                    CornerRadius="8" />
+                            <Button Grid.Column="1"
+                                    Text="&#x2717; Fail"
+                                    BackgroundColor="{Binding KetoPass, Converter={StaticResource ToggleColor}, ConverterParameter=false}"
+                                    TextColor="{Binding KetoPass, Converter={StaticResource ToggleTextColor}, ConverterParameter=false}"
+                                    Command="{Binding SetKetoPassCommand}"
+                                    CommandParameter="false"
+                                    CornerRadius="8" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- OMAD Section -->
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="OMAD (One Meal a Day)" Style="{StaticResource SectionLabel}" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <Button Grid.Column="0"
+                                    Text="&#x2713; Pass"
+                                    BackgroundColor="{Binding OmadPass, Converter={StaticResource ToggleColor}, ConverterParameter=true}"
+                                    TextColor="{Binding OmadPass, Converter={StaticResource ToggleTextColor}, ConverterParameter=true}"
+                                    Command="{Binding SetOmadPassCommand}"
+                                    CommandParameter="true"
+                                    CornerRadius="8" />
+                            <Button Grid.Column="1"
+                                    Text="&#x2717; Fail"
+                                    BackgroundColor="{Binding OmadPass, Converter={StaticResource ToggleColor}, ConverterParameter=false}"
+                                    TextColor="{Binding OmadPass, Converter={StaticResource ToggleTextColor}, ConverterParameter=false}"
+                                    Command="{Binding SetOmadPassCommand}"
+                                    CommandParameter="false"
+                                    CornerRadius="8" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Weight Section -->
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Weight (kg)" Style="{StaticResource SectionLabel}" />
+                        <Entry
+                            Text="{Binding WeightText}"
+                            Placeholder="e.g. 82.5"
+                            Keyboard="Numeric"
+                            PlaceholderColor="#757575"
+                            TextColor="White"
+                            BackgroundColor="#2D2D44" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Meals Section -->
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Meals" Style="{StaticResource SectionLabel}" />
+
+                        <CollectionView
+                            ItemsSource="{Binding Meals}"
+                            SelectionMode="None">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:MealEntryViewModel">
+                                    <Border Margin="0,4" Padding="8" BackgroundColor="#2D2D44" StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8" />
+                                        </Border.StrokeShape>
+                                        <Grid ColumnDefinitions="120,*,Auto" ColumnSpacing="8">
+                                            <Picker Grid.Column="0"
+                                                    ItemsSource="{Binding TimeSlots}"
+                                                    SelectedIndex="{Binding SelectedTimeIndex}"
+                                                    TextColor="White"
+                                                    BackgroundColor="Transparent"
+                                                    Title="Time" />
+                                            <Entry Grid.Column="1"
+                                                   Text="{Binding Description}"
+                                                   Placeholder="What did you eat?"
+                                                   PlaceholderColor="#757575"
+                                                   TextColor="White"
+                                                   BackgroundColor="Transparent" />
+                                            <Button Grid.Column="2"
+                                                    Text="&#x2715;"
+                                                    TextColor="#F44336"
+                                                    BackgroundColor="Transparent"
+                                                    FontSize="16"
+                                                    Padding="4"
+                                                    WidthRequest="36"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveMealCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <Button
+                            Text="+ Add Meal"
+                            Command="{Binding AddMealCommand}"
+                            IsVisible="{Binding CanAddMeal}"
+                            BackgroundColor="#2D2D44"
+                            TextColor="#4CAF50"
+                            CornerRadius="8"
+                            Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Ketone Section -->
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Ketone Level (mmol/L)" Style="{StaticResource SectionLabel}" />
+                        <Grid ColumnDefinitions="*,120" ColumnSpacing="8">
+                            <Entry Grid.Column="0"
+                                   Text="{Binding KetoneValueText}"
+                                   Placeholder="e.g. 1.5"
+                                   Keyboard="Numeric"
+                                   PlaceholderColor="#757575"
+                                   TextColor="White"
+                                   BackgroundColor="#2D2D44" />
+                            <Picker Grid.Column="1"
+                                    ItemsSource="{Binding TimeSlots}"
+                                    SelectedIndex="{Binding KetoneTimeIndex}"
+                                    TextColor="White"
+                                    BackgroundColor="#2D2D44"
+                                    Title="Time" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Notes Section -->
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Notes" Style="{StaticResource SectionLabel}" />
+                        <Editor
+                            Text="{Binding Notes}"
+                            Placeholder="How did you feel today? Any observations..."
+                            PlaceholderColor="#757575"
+                            TextColor="White"
+                            BackgroundColor="#2D2D44"
+                            AutoSize="TextChanges"
+                            MinimumHeightRequest="80" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Save Button + indicator -->
+        <Grid Grid.Row="1" Padding="16,8" BackgroundColor="#2D2D44">
+            <Button
+                Text="Save"
+                Command="{Binding SaveCommand}"
+                BackgroundColor="#4CAF50"
+                TextColor="White"
+                CornerRadius="10"
+                FontSize="16"
+                IsVisible="{Binding IsSaved, Converter={StaticResource InverseBool}}"
+                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}" />
+            <Label
+                Text="&#x2713; Saved!"
+                TextColor="#4CAF50"
+                FontSize="16"
+                FontAttributes="Bold"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                IsVisible="{Binding IsSaved}" />
+        </Grid>
+
+    </Grid>
+</ContentPage>

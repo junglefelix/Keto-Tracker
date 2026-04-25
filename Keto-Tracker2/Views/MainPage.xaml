@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:Keto_Tracker2.ViewModels"
+    xmlns:conv="clr-namespace:Keto_Tracker2.Converters"
+    x:Class="Keto_Tracker2.Views.MainPage"
+    Title="Keto Tracker"
+    BackgroundColor="#1E1E2E">
+
+    <ContentPage.Resources>
+        <conv:KetoPassToColorConverter x:Key="KetoPassToColor" />
+        <conv:KetoPassToTextColorConverter x:Key="KetoPassToTextColor" />
+        <conv:OmadToRingColorConverter x:Key="OmadToRingColor" />
+        <conv:IsFutureToOpacityConverter x:Key="IsFutureToOpacity" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header: Month Navigation -->
+        <Grid Grid.Row="0" Padding="16,12" ColumnDefinitions="Auto,*,Auto" BackgroundColor="#2D2D44">
+            <Button Grid.Column="0"
+                    Text="&#x2039;"
+                    FontSize="28"
+                    TextColor="White"
+                    BackgroundColor="Transparent"
+                    Padding="8,0"
+                    Command="{Binding PrevMonthCommand}" />
+
+            <Label Grid.Column="1"
+                   Text="{Binding MonthLabel}"
+                   TextColor="White"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+
+            <Button Grid.Column="2"
+                    Text="&#x203A;"
+                    FontSize="28"
+                    TextColor="White"
+                    BackgroundColor="Transparent"
+                    Padding="8,0"
+                    Command="{Binding NextMonthCommand}" />
+        </Grid>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="8,8">
+
+                <!-- Day of week headers -->
+                <Grid ColumnDefinitions="*,*,*,*,*,*,*" Margin="0,0,0,4">
+                    <Label Grid.Column="0" Text="Su" Style="{StaticResource DayHeaderLabel}" />
+                    <Label Grid.Column="1" Text="Mo" Style="{StaticResource DayHeaderLabel}" />
+                    <Label Grid.Column="2" Text="Tu" Style="{StaticResource DayHeaderLabel}" />
+                    <Label Grid.Column="3" Text="We" Style="{StaticResource DayHeaderLabel}" />
+                    <Label Grid.Column="4" Text="Th" Style="{StaticResource DayHeaderLabel}" />
+                    <Label Grid.Column="5" Text="Fr" Style="{StaticResource DayHeaderLabel}" />
+                    <Label Grid.Column="6" Text="Sa" Style="{StaticResource DayHeaderLabel}" />
+                </Grid>
+
+                <!-- Calendar grid -->
+                <CollectionView
+                    ItemsSource="{Binding Days}"
+                    SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="7" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:DayCell">
+                            <Grid Padding="2" HeightRequest="64">
+                                <!-- OMAD gold ring (outer border) -->
+                                <Border
+                                    WidthRequest="48"
+                                    HeightRequest="48"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center"
+                                    StrokeThickness="3"
+                                    Stroke="{Binding OmadPass, Converter={StaticResource OmadToRingColor}}"
+                                    IsVisible="{Binding IsCurrentMonth}">
+                                    <Border.StrokeShape>
+                                        <Ellipse />
+                                    </Border.StrokeShape>
+                                    <Border.Background>
+                                        <SolidColorBrush Color="Transparent" />
+                                    </Border.Background>
+                                </Border>
+
+                                <!-- Day circle -->
+                                <Border
+                                    WidthRequest="40"
+                                    HeightRequest="40"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center"
+                                    StrokeThickness="0"
+                                    BackgroundColor="{Binding KetoPass, Converter={StaticResource KetoPassToColor}}"
+                                    Opacity="{Binding IsFuture, Converter={StaticResource IsFutureToOpacity}}"
+                                    IsVisible="{Binding IsCurrentMonth}">
+                                    <Border.StrokeShape>
+                                        <Ellipse />
+                                    </Border.StrokeShape>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            CommandParameter="{Binding .}"
+                                            Tapped="OnDayTapped" />
+                                    </Border.GestureRecognizers>
+                                    <Label
+                                        Text="{Binding Date.Day}"
+                                        TextColor="{Binding KetoPass, Converter={StaticResource KetoPassToTextColor}}"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center"
+                                        FontSize="15"
+                                        FontAttributes="Bold" />
+                                </Border>
+
+                                <!-- Today indicator dot -->
+                                <Ellipse
+                                    WidthRequest="6"
+                                    HeightRequest="6"
+                                    Fill="White"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="End"
+                                    Margin="0,0,0,4"
+                                    IsVisible="{Binding IsToday}" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
