@@ -19,65 +19,87 @@
         <ScrollView Grid.Row="0">
             <VerticalStackLayout Padding="16,12" Spacing="16">
 
-                <!-- Keto Section -->
-                <Border Style="{StaticResource CardBorder}">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Keto" Style="{StaticResource SectionLabel}" />
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                            <Button Grid.Column="0"
-                                    Text="&#x2713; Pass"
-                                    BackgroundColor="{Binding KetoPass, Converter={StaticResource ToggleColor}, ConverterParameter=true}"
-                                    TextColor="{Binding KetoPass, Converter={StaticResource ToggleTextColor}, ConverterParameter=true}"
-                                    Command="{Binding SetKetoPassCommand}"
-                                    CommandParameter="true"
-                                    CornerRadius="8" />
-                            <Button Grid.Column="1"
-                                    Text="&#x2717; Fail"
-                                    BackgroundColor="{Binding KetoPass, Converter={StaticResource ToggleColor}, ConverterParameter=false}"
-                                    TextColor="{Binding KetoPass, Converter={StaticResource ToggleTextColor}, ConverterParameter=false}"
-                                    Command="{Binding SetKetoPassCommand}"
-                                    CommandParameter="false"
-                                    CornerRadius="8" />
-                        </Grid>
-                    </VerticalStackLayout>
-                </Border>
+                <!-- Keto + OMAD Section -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                    <Border Grid.Column="0" Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Keto" Style="{StaticResource SectionLabel}" />
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                <Button Grid.Column="0"
+                                        Text="&#x2713; Pass"
+                                        BackgroundColor="{Binding KetoPass, Converter={StaticResource ToggleColor}, ConverterParameter=true}"
+                                        TextColor="{Binding KetoPass, Converter={StaticResource ToggleTextColor}, ConverterParameter=true}"
+                                        Command="{Binding SetKetoPassCommand}"
+                                        CommandParameter="true"
+                                        CornerRadius="8" />
+                                <Button Grid.Column="1"
+                                        Text="&#x2717; Fail"
+                                        BackgroundColor="{Binding KetoPass, Converter={StaticResource ToggleColor}, ConverterParameter=false}"
+                                        TextColor="{Binding KetoPass, Converter={StaticResource ToggleTextColor}, ConverterParameter=false}"
+                                        Command="{Binding SetKetoPassCommand}"
+                                        CommandParameter="false"
+                                        CornerRadius="8" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="OMAD" Style="{StaticResource SectionLabel}" />
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                <Button Grid.Column="0"
+                                        Text="&#x2713; Pass"
+                                        BackgroundColor="{Binding OmadPass, Converter={StaticResource ToggleColor}, ConverterParameter=true}"
+                                        TextColor="{Binding OmadPass, Converter={StaticResource ToggleTextColor}, ConverterParameter=true}"
+                                        Command="{Binding SetOmadPassCommand}"
+                                        CommandParameter="true"
+                                        CornerRadius="8" />
+                                <Button Grid.Column="1"
+                                        Text="&#x2717; Fail"
+                                        BackgroundColor="{Binding OmadPass, Converter={StaticResource ToggleColor}, ConverterParameter=false}"
+                                        TextColor="{Binding OmadPass, Converter={StaticResource ToggleTextColor}, ConverterParameter=false}"
+                                        Command="{Binding SetOmadPassCommand}"
+                                        CommandParameter="false"
+                                        CornerRadius="8" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
 
-                <!-- OMAD Section -->
-                <Border Style="{StaticResource CardBorder}">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="OMAD (One Meal a Day)" Style="{StaticResource SectionLabel}" />
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                            <Button Grid.Column="0"
-                                    Text="&#x2713; Pass"
-                                    BackgroundColor="{Binding OmadPass, Converter={StaticResource ToggleColor}, ConverterParameter=true}"
-                                    TextColor="{Binding OmadPass, Converter={StaticResource ToggleTextColor}, ConverterParameter=true}"
-                                    Command="{Binding SetOmadPassCommand}"
-                                    CommandParameter="true"
-                                    CornerRadius="8" />
-                            <Button Grid.Column="1"
-                                    Text="&#x2717; Fail"
-                                    BackgroundColor="{Binding OmadPass, Converter={StaticResource ToggleColor}, ConverterParameter=false}"
-                                    TextColor="{Binding OmadPass, Converter={StaticResource ToggleTextColor}, ConverterParameter=false}"
-                                    Command="{Binding SetOmadPassCommand}"
-                                    CommandParameter="false"
-                                    CornerRadius="8" />
-                        </Grid>
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- Weight Section -->
-                <Border Style="{StaticResource CardBorder}">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Weight (kg)" Style="{StaticResource SectionLabel}" />
-                        <Entry
-                            Text="{Binding WeightText}"
-                            Placeholder="e.g. 82.5"
-                            Keyboard="Numeric"
-                            PlaceholderColor="#757575"
-                            TextColor="White"
-                            BackgroundColor="#2D2D44" />
-                    </VerticalStackLayout>
-                </Border>
+                <!-- Weight + Ketone Section -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                    <Border Grid.Column="0" Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Weight (kg)" Style="{StaticResource SectionLabel}" />
+                            <Entry
+                                Text="{Binding WeightText}"
+                                Placeholder="e.g. 82.5"
+                                Keyboard="Numeric"
+                                PlaceholderColor="#757575"
+                                TextColor="White"
+                                BackgroundColor="#2D2D44" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource CardBorder}">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Ketone (mmol/L)" Style="{StaticResource SectionLabel}" />
+                            <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
+                                <Entry Grid.Column="0"
+                                    Text="{Binding KetoneValueText}"
+                                    Placeholder="e.g. 1.5"
+                                    Keyboard="Numeric"
+                                    PlaceholderColor="#757575"
+                                    TextColor="White"
+                                    BackgroundColor="#2D2D44" />
+                                <Picker Grid.Column="1"
+                                    ItemsSource="{Binding TimeSlots}"
+                                    SelectedIndex="{Binding KetoneTimeIndex}"
+                                    TextColor="White"
+                                    BackgroundColor="#2D2D44"
+                                    Title="Time" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
 
                 <!-- Meals Section -->
                 <Border Style="{StaticResource CardBorder}">
@@ -93,19 +115,21 @@
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="8" />
                                         </Border.StrokeShape>
-                                        <Grid ColumnDefinitions="120,*,Auto" ColumnSpacing="8">
+                                        <Grid ColumnDefinitions="80,*,Auto" ColumnSpacing="8">
                                             <Picker Grid.Column="0"
                                                     ItemsSource="{Binding TimeSlots}"
                                                     SelectedIndex="{Binding SelectedTimeIndex}"
                                                     TextColor="White"
                                                     BackgroundColor="Transparent"
                                                     Title="Time" />
-                                            <Entry Grid.Column="1"
-                                                   Text="{Binding Description}"
-                                                   Placeholder="What did you eat?"
-                                                   PlaceholderColor="#757575"
-                                                   TextColor="White"
-                                                   BackgroundColor="Transparent" />
+                                            <Editor Grid.Column="1"
+                                                    Text="{Binding Description}"
+                                                    Placeholder="What did you eat?"
+                                                    PlaceholderColor="#757575"
+                                                    TextColor="White"
+                                                    BackgroundColor="Transparent"
+                                                    AutoSize="TextChanges"
+                                                    MinimumHeightRequest="40" />
                                             <Button Grid.Column="2"
                                                     Text="&#x2715;"
                                                     TextColor="#F44336"
@@ -132,27 +156,7 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Ketone Section -->
-                <Border Style="{StaticResource CardBorder}">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Ketone Level (mmol/L)" Style="{StaticResource SectionLabel}" />
-                        <Grid ColumnDefinitions="*,120" ColumnSpacing="8">
-                            <Entry Grid.Column="0"
-                                   Text="{Binding KetoneValueText}"
-                                   Placeholder="e.g. 1.5"
-                                   Keyboard="Numeric"
-                                   PlaceholderColor="#757575"
-                                   TextColor="White"
-                                   BackgroundColor="#2D2D44" />
-                            <Picker Grid.Column="1"
-                                    ItemsSource="{Binding TimeSlots}"
-                                    SelectedIndex="{Binding KetoneTimeIndex}"
-                                    TextColor="White"
-                                    BackgroundColor="#2D2D44"
-                                    Title="Time" />
-                        </Grid>
-                    </VerticalStackLayout>
-                </Border>
+
 
                 <!-- Notes Section -->
                 <Border Style="{StaticResource CardBorder}">
