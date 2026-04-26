@@ -8,6 +8,10 @@
     Title="Keto Tracker"
     BackgroundColor="#1E1E2E">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="&#x22EE;" Order="Default" Clicked="OnMenuClicked" />
+    </ContentPage.ToolbarItems>
+
     <ContentPage.Resources>
         <conv:KetoPassToColorConverter x:Key="KetoPassToColor" />
         <conv:KetoPassToTextColorConverter x:Key="KetoPassToTextColor" />
