@@ -16,6 +16,9 @@
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Keto_Tracker2</RootNamespace>
 		<UseMaui>true</UseMaui>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+  
+    
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
