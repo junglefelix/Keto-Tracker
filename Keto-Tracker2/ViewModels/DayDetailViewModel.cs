@@ -74,7 +74,7 @@ public partial class DayDetailViewModel : ObservableObject
 
             KetoPass = _dayEntry.KetoPass;
             OmadPass = _dayEntry.OmadPass;
-            WeightText = _dayEntry.WeightKg?.ToString("F1") ?? string.Empty;
+            WeightText = _dayEntry.WeightKg?.ToString("0.##") ?? string.Empty;
             Notes = _dayEntry.Notes ?? string.Empty;
 
             var mealModels = await _db.GetMealsForDayAsync(_dayEntry.Id);
@@ -86,7 +86,7 @@ public partial class DayDetailViewModel : ObservableObject
             _ketoneEntry = await _db.GetKetoneForDayAsync(_dayEntry.Id);
             if (_ketoneEntry is not null)
             {
-                KetoneValueText = _ketoneEntry.Value.ToString("F1");
+                KetoneValueText = _ketoneEntry.Value.ToString("0.##");
                 int totalMins = (int)_ketoneEntry.TimeOfDay.TotalMinutes;
                 KetoneTimeIndex = Math.Clamp(totalMins / 30, 0, TimeSlots.Count - 1);
             }

@@ -103,6 +103,17 @@ public class DatabaseService
         await _db!.DeleteAsync(ketone);
     }
 
+    public async Task<List<DayEntry>> GetDayEntriesInRangeAsync(DateTime from, DateTime to)
+    {
+        await InitAsync();
+        var start = from.Date;
+        var end = to.Date;
+        return await _db!.Table<DayEntry>()
+            .Where(d => d.Date >= start && d.Date <= end)
+            .OrderBy(d => d.Date)
+            .ToListAsync();
+    }
+
     // ── Bulk operations for import/export ──────────────────────────────────
 
     public async Task<KetoTrackerData> GetAllDataAsync()

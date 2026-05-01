@@ -21,4 +21,7 @@ public partial class DayCell : ObservableObject
 
     [ObservableProperty]
     private bool _isCurrentMonth;
+
+    [ObservableProperty]
+    private bool _hasData;
 }

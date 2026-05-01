@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Keto_Tracker2.Models;
 using Keto_Tracker2.Services;
 using System.Collections.ObjectModel;
 
@@ -14,6 +15,18 @@ public partial class CalendarViewModel : ObservableObject
 
     [ObservableProperty]
     private ObservableCollection<DayCell> _days = new();
+
+    [ObservableProperty]
+    private int _ketoStreakDays;
+
+    [ObservableProperty]
+    private int _omadStreakDays;
+
+    [ObservableProperty]
+    private WeightChartDrawable _weightChart = new();
+
+    [ObservableProperty]
+    private bool _hasWeightData;
 
     private DateTime _currentMonth;
 
@@ -71,11 +84,53 @@ public partial class CalendarViewModel : ObservableObject
                 OmadPass = entry?.OmadPass,
                 IsToday = date == today,
                 IsFuture = isFuture,
-                IsCurrentMonth = true
+                IsCurrentMonth = true,
+                HasData = entry is not null && (
+                    entry.KetoPass.HasValue ||
+                    entry.OmadPass.HasValue ||
+                    entry.WeightKg.HasValue ||
+                    !string.IsNullOrEmpty(entry.Notes))
             });
         }
 
         Days = cells;
+        await ComputeStatsAsync();
+    }
+
+    private async Task ComputeStatsAsync()
+    {
+        var today = DateTime.Today;
+        var from = today.AddDays(-1095); // look back up to 3 years
+        var allEntries = await _db.GetDayEntriesInRangeAsync(from, today);
+        var entryDict = allEntries.ToDictionary(e => e.Date.Date);
+
+        KetoStreakDays = ComputeStreak(entryDict, today.AddDays(-1), e => e.KetoPass);
+        OmadStreakDays = ComputeStreak(entryDict, today.AddDays(-1), e => e.OmadPass);
+
+        var weightPoints = allEntries
+            .Where(e => e.WeightKg.HasValue)
+            .OrderBy(e => e.Date)
+            .Select(e => (e.Date, e.WeightKg!.Value))
+            .ToList();
+
+        HasWeightData = weightPoints.Count > 0;
+        WeightChart = new WeightChartDrawable { Points = weightPoints };
+    }
+
+    private static int ComputeStreak(
+        Dictionary<DateTime, DayEntry> entries,
+        DateTime from,
+        Func<DayEntry, bool?> selector)
+    {
+        int streak = 0;
+        for (var date = from; date >= from.AddDays(-1095); date = date.AddDays(-1))
+        {
+            if (entries.TryGetValue(date.Date, out var entry) && selector(entry) == true)
+                streak++;
+            else
+                break;
+        }
+        return streak;
     }
 
     public async Task RefreshAsync()

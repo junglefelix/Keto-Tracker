@@ -30,6 +30,16 @@ public partial class MainPage : ContentPage
         }
     }
 
+    private void OnSwipedLeft(object sender, SwipedEventArgs e)
+    {
+        _viewModel.NextMonthCommand.Execute(null);
+    }
+
+    private void OnSwipedRight(object sender, SwipedEventArgs e)
+    {
+        _viewModel.PrevMonthCommand.Execute(null);
+    }
+
     private async void OnMenuClicked(object sender, EventArgs e)
     {
         var action = await DisplayActionSheet(

@@ -13,13 +13,18 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Resources>
-        <conv:KetoPassToColorConverter x:Key="KetoPassToColor" />
-        <conv:KetoPassToTextColorConverter x:Key="KetoPassToTextColor" />
+        <conv:DayCellToColorConverter x:Key="DayCellToColor" />
+        <conv:DayCellToTextColorConverter x:Key="DayCellToTextColor" />
         <conv:OmadToRingColorConverter x:Key="OmadToRingColor" />
         <conv:IsFutureToOpacityConverter x:Key="IsFutureToOpacity" />
+        <conv:InverseBoolConverter x:Key="InverseBool" />
     </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto,*">
+        <Grid.GestureRecognizers>
+            <SwipeGestureRecognizer Direction="Left"  Swiped="OnSwipedLeft" />
+            <SwipeGestureRecognizer Direction="Right" Swiped="OnSwipedRight" />
+        </Grid.GestureRecognizers>
 
         <!-- Header: Month Navigation -->
         <Grid Grid.Row="0" Padding="16,12" ColumnDefinitions="Auto,*,Auto" BackgroundColor="#2D2D44">
@@ -96,7 +101,7 @@
                                     HorizontalOptions="Center"
                                     VerticalOptions="Center"
                                     StrokeThickness="0"
-                                    BackgroundColor="{Binding KetoPass, Converter={StaticResource KetoPassToColor}}"
+                                    BackgroundColor="{Binding ., Converter={StaticResource DayCellToColor}}"
                                     Opacity="{Binding IsFuture, Converter={StaticResource IsFutureToOpacity}}"
                                     IsVisible="{Binding IsCurrentMonth}">
                                     <Border.StrokeShape>
@@ -109,7 +114,7 @@
                                     </Border.GestureRecognizers>
                                     <Label
                                         Text="{Binding Date.Day}"
-                                        TextColor="{Binding KetoPass, Converter={StaticResource KetoPassToTextColor}}"
+                                        TextColor="{Binding ., Converter={StaticResource DayCellToTextColor}}"
                                         HorizontalOptions="Center"
                                         VerticalOptions="Center"
                                         FontSize="15"
@@ -129,6 +134,76 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
+
+                <!-- Divider -->
+                <BoxView HeightRequest="1" BackgroundColor="#3D3D54" Margin="4,12,4,12" />
+
+                <!-- Statistics Section -->
+                <Grid ColumnDefinitions="*,*" Margin="4,0,4,0" ColumnSpacing="8">
+
+                    <!-- Keto Streak -->
+                    <Border Grid.Column="0"
+                            BackgroundColor="#2D2D44"
+                            StrokeThickness="0"
+                            Padding="14,10">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="Keto Streak"
+                                   TextColor="#9E9EC8"
+                                   FontSize="12" />
+                            <Label Text="{Binding KetoStreakDays, StringFormat='{0} days'}"
+                                   TextColor="#4CAF50"
+                                   FontSize="24"
+                                   FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- OMAD Streak -->
+                    <Border Grid.Column="1"
+                            BackgroundColor="#2D2D44"
+                            StrokeThickness="0"
+                            Padding="14,10">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="OMAD Streak"
+                                   TextColor="#9E9EC8"
+                                   FontSize="12" />
+                            <Label Text="{Binding OmadStreakDays, StringFormat='{0} days'}"
+                                   TextColor="#FFD700"
+                                   FontSize="24"
+                                   FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                </Grid>
+
+                <!-- Weight Trend Chart -->
+                <Border BackgroundColor="#2D2D44"
+                        StrokeThickness="0"
+                        Padding="12,10"
+                        Margin="4,8,4,8">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Weight Trend"
+                               TextColor="#9E9EC8"
+                               FontSize="12" />
+                        <GraphicsView
+                            Drawable="{Binding WeightChart}"
+                            HeightRequest="110"
+                            IsVisible="{Binding HasWeightData}" />
+                        <Label Text="No weight data recorded yet"
+                               TextColor="#555570"
+                               FontSize="13"
+                               HorizontalOptions="Center"
+                               IsVisible="{Binding HasWeightData, Converter={StaticResource InverseBool}}" />
+                    </VerticalStackLayout>
+                </Border>
 
             </VerticalStackLayout>
         </ScrollView>
