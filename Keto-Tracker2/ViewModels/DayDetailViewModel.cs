@@ -63,8 +63,35 @@ public partial class DayDetailViewModel : ObservableObject
         _db = db;
     }
 
+    private DateTime _currentDate;
+    private bool _isChangingDay;
+
+    /// <summary>
+    /// Saves the day currently shown and switches to the day <paramref name="offsetDays"/> away
+    /// (+1 = next day, -1 = previous day). Edits are never lost: they are saved the same way
+    /// as when leaving the page with Back.
+    /// </summary>
+    public async Task<bool> GoToDayAsync(int offsetDays)
+    {
+        if (_dayEntry is null || _isChangingDay) return false;
+        _isChangingDay = true;
+        try
+        {
+            await PersistAsync();
+            var target = _currentDate.AddDays(offsetDays);
+            _dateTicks = target.Ticks;
+            await LoadAsync(target);
+            return true;
+        }
+        finally
+        {
+            _isChangingDay = false;
+        }
+    }
+
     private async Task LoadAsync(DateTime date)
     {
+        _currentDate = date.Date;
         IsBusy = true;
         try
         {
@@ -167,32 +194,7 @@ public partial class DayDetailViewModel : ObservableObject
         IsBusy = true;
         try
         {
-            _dayEntry.KetoPass = KetoPass;
-            _dayEntry.OmadPass = OmadPass;
-            _dayEntry.WeightKg = double.TryParse(WeightText, out double w) ? w : null;
-            _dayEntry.Notes = Notes;
-            await _db.SaveDayEntryAsync(_dayEntry);
-
-            foreach (var mealVm in Meals)
-            {
-                mealVm.SyncToModel();
-                await _db.SaveMealAsync(mealVm.Model);
-            }
-
-            foreach (var ketoneVm in Ketones.ToList())
-            {
-                if (!string.IsNullOrWhiteSpace(ketoneVm.ValueText) && double.TryParse(ketoneVm.ValueText, out _))
-                {
-                    ketoneVm.SyncToModel();
-                    await _db.SaveKetoneAsync(ketoneVm.Model);
-                }
-                else
-                {
-                    await _db.DeleteKetoneAsync(ketoneVm.Model);
-                    Ketones.Remove(ketoneVm);
-                }
-            }
-            UpdateCanAddKetone();
+            await PersistAsync();
 
             IsSaved = true;
             await Task.Delay(1500);
@@ -202,5 +204,37 @@ public partial class DayDetailViewModel : ObservableObject
         {
             IsBusy = false;
         }
+    }
+
+    /// <summary>Writes the current form values to the database (no UI feedback).</summary>
+    private async Task PersistAsync()
+    {
+        if (_dayEntry is null) return;
+        _dayEntry.KetoPass = KetoPass;
+        _dayEntry.OmadPass = OmadPass;
+        _dayEntry.WeightKg = double.TryParse(WeightText, out double w) ? w : null;
+        _dayEntry.Notes = Notes;
+        await _db.SaveDayEntryAsync(_dayEntry);
+
+        foreach (var mealVm in Meals)
+        {
+            mealVm.SyncToModel();
+            await _db.SaveMealAsync(mealVm.Model);
+        }
+
+        foreach (var ketoneVm in Ketones.ToList())
+        {
+            if (!string.IsNullOrWhiteSpace(ketoneVm.ValueText) && double.TryParse(ketoneVm.ValueText, out _))
+            {
+                ketoneVm.SyncToModel();
+                await _db.SaveKetoneAsync(ketoneVm.Model);
+            }
+            else
+            {
+                await _db.DeleteKetoneAsync(ketoneVm.Model);
+                Ketones.Remove(ketoneVm);
+            }
+        }
+        UpdateCanAddKetone();
     }
 }
