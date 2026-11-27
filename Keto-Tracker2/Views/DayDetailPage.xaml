@@ -68,7 +68,7 @@
                 <!-- Weight + Ketone Section -->
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
                     <Border Grid.Column="0" Style="{StaticResource CardBorder}">
-                        <VerticalStackLayout Spacing="8">
+                        <VerticalStackLayout Spacing="2">
                             <Label Text="Weight (kg)" Style="{StaticResource SectionLabel}" />
                             <Entry
                                 Text="{Binding WeightText}"
@@ -76,46 +76,80 @@
                                 Keyboard="Numeric"
                                 PlaceholderColor="#757575"
                                 TextColor="White"
-                                BackgroundColor="#2D2D44" />
+                                BackgroundColor="#2D2D44"
+                                HeightRequest="36"
+                                MinimumHeightRequest="36" />
                         </VerticalStackLayout>
                     </Border>
                     <Border Grid.Column="1" Style="{StaticResource CardBorder}">
-                        <VerticalStackLayout Spacing="8">
+                        <VerticalStackLayout Spacing="2">
                             <Label Text="Ketone (mmol/L)" Style="{StaticResource SectionLabel}" />
-                            <Grid ColumnDefinitions="*,90" ColumnSpacing="8">
-                                <Entry Grid.Column="0"
-                                    Text="{Binding KetoneValueText}"
-                                    Placeholder="e.g. 1.5"
-                                    Keyboard="Numeric"
-                                    PlaceholderColor="#757575"
-                                    TextColor="White"
-                                    BackgroundColor="#2D2D44" />
-                                <Picker Grid.Column="1"
-                                    ItemsSource="{Binding TimeSlots}"
-                                    SelectedIndex="{Binding KetoneTimeIndex}"
-                                    TextColor="White"
-                                    BackgroundColor="#2D2D44"
-                                    Title="Time" />
-                            </Grid>
+
+                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding Ketones}" Spacing="3">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:KetoneEntryViewModel">
+                                        <Grid ColumnDefinitions="*,80,Auto" ColumnSpacing="4">
+                                            <Entry Grid.Column="0"
+                                                Text="{Binding ValueText}"
+                                                Placeholder="e.g. 1.5"
+                                                Keyboard="Numeric"
+                                                PlaceholderColor="#757575"
+                                                TextColor="White"
+                                                BackgroundColor="#2D2D44"
+                                                HeightRequest="36"
+                                                MinimumHeightRequest="36" />
+                                            <Picker Grid.Column="1"
+                                                ItemsSource="{Binding TimeSlots}"
+                                                SelectedIndex="{Binding SelectedTimeIndex}"
+                                                TextColor="White"
+                                                BackgroundColor="#2D2D44"
+                                                HeightRequest="36"
+                                                MinimumHeightRequest="36"
+                                                Title="Time" />
+                                            <Button Grid.Column="2"
+                                                    Text="&#x2715;"
+                                                    TextColor="#F44336"
+                                                    BackgroundColor="Transparent"
+                                                    FontSize="14"
+                                                    Padding="0"
+                                                    WidthRequest="28"
+                                                    HeightRequest="36"
+                                                    MinimumHeightRequest="36"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveKetoneCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+
+                            <Button
+                                Text="+ Add"
+                                Command="{Binding AddKetoneCommand}"
+                                IsVisible="{Binding CanAddKetone}"
+                                BackgroundColor="#2D2D44"
+                                TextColor="#4CAF50"
+                                FontSize="12"
+                                CornerRadius="8"
+                                HeightRequest="32"
+                                MinimumHeightRequest="32"
+                                Padding="0" />
                         </VerticalStackLayout>
                     </Border>
                 </Grid>
 
                 <!-- Meals Section -->
                 <Border Style="{StaticResource CardBorder}">
-                    <VerticalStackLayout Spacing="8">
+                    <VerticalStackLayout Spacing="4">
                         <Label Text="Meals" Style="{StaticResource SectionLabel}" />
 
-                        <CollectionView
-                            ItemsSource="{Binding Meals}"
-                            SelectionMode="None">
-                            <CollectionView.ItemTemplate>
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Meals}" Spacing="4">
+                            <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="vm:MealEntryViewModel">
-                                    <Border Margin="0,4" Padding="8" BackgroundColor="#2D2D44" StrokeThickness="0">
+                                    <Border Padding="8" BackgroundColor="#2D2D44" StrokeThickness="0">
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="8" />
                                         </Border.StrokeShape>
-                                        <Grid ColumnDefinitions="80,*,Auto" ColumnSpacing="8">
+                                        <Grid ColumnDefinitions="60,*,Auto" ColumnSpacing="8">
                                             <Picker Grid.Column="0"
                                                     ItemsSource="{Binding TimeSlots}"
                                                     SelectedIndex="{Binding SelectedTimeIndex}"
@@ -142,8 +176,8 @@
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
 
                         <Button
                             Text="+ Add Meal"
@@ -151,8 +185,7 @@
                             IsVisible="{Binding CanAddMeal}"
                             BackgroundColor="#2D2D44"
                             TextColor="#4CAF50"
-                            CornerRadius="8"
-                            Margin="0,4,0,0" />
+                            CornerRadius="8" />
                     </VerticalStackLayout>
                 </Border>
 
@@ -160,7 +193,7 @@
 
                 <!-- Notes Section -->
                 <Border Style="{StaticResource CardBorder}">
-                    <VerticalStackLayout Spacing="8">
+                    <VerticalStackLayout Spacing="2">
                         <Label Text="Notes" Style="{StaticResource SectionLabel}" />
                         <Editor
                             Text="{Binding Notes}"

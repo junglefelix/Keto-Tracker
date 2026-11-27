@@ -30,6 +30,12 @@ public partial class MainPage : ContentPage
         }
     }
 
+    private async void OnWeightChartTapped(object sender, TappedEventArgs e)
+    {
+        if (!_viewModel.HasAnyWeightData) return;
+        await Shell.Current.GoToAsync("WeightTrendPage");
+    }
+
     private void OnSwipedLeft(object sender, SwipedEventArgs e)
     {
         _viewModel.NextMonthCommand.Execute(null);

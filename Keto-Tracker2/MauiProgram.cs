@@ -25,10 +25,12 @@ public static class MauiProgram
         // ViewModels
         builder.Services.AddSingleton<CalendarViewModel>();
         builder.Services.AddTransient<DayDetailViewModel>();
+        builder.Services.AddTransient<WeightTrendViewModel>();
 
         // Pages
         builder.Services.AddSingleton<MainPage>();
         builder.Services.AddTransient<DayDetailPage>();
+        builder.Services.AddTransient<WeightTrendPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

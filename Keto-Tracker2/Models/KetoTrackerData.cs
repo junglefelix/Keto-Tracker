@@ -18,6 +18,10 @@ public class DayRecord
     public double? WeightKg { get; set; }
     public string? Notes { get; set; }
     public List<MealRecord> Meals { get; set; } = new();
+    public List<KetoneRecord> Ketones { get; set; } = new();
+
+    // Legacy single-ketone field from older exports; only ever populated when reading, never written.
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public KetoneRecord? Ketone { get; set; }
 }
 

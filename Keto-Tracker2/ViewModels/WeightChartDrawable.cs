@@ -72,12 +72,24 @@ public class WeightChartDrawable : IDrawable
         // Day labels
         canvas.FontColor = Color.FromArgb("#9E9EC8");
         canvas.FontSize = 8f;
-        int maxLabels = (int)(width / 18f);
+
+        double spanDays = (Points[^1].Date - Points[0].Date).TotalDays;
+        float labelSlotWidth = spanDays <= 31 ? 18f : spanDays <= 366 ? 32f : 42f;
+        float labelBoxWidth = spanDays <= 31 ? 16f : spanDays <= 366 ? 36f : 44f;
+
+        string FormatLabel(DateTime d) => spanDays switch
+        {
+            <= 31 => d.Day.ToString(),
+            <= 366 => d.ToString("MMM d"),
+            _ => d.ToString("MMM yyyy")
+        };
+
+        int maxLabels = Math.Max(1, (int)(width / labelSlotWidth));
         int step = Points.Count <= maxLabels ? 1 : (int)Math.Ceiling((double)Points.Count / maxLabels);
         for (int i = 0; i < coords.Count; i += step)
         {
-            string label = Points[i].Date.Day.ToString();
-            canvas.DrawString(label, coords[i].X - 8f, bottom + 2f, 16f, 14f,
+            string label = FormatLabel(Points[i].Date);
+            canvas.DrawString(label, coords[i].X - labelBoxWidth / 2f, bottom + 2f, labelBoxWidth, 14f,
                 HorizontalAlignment.Center, VerticalAlignment.Top);
         }
     }

@@ -11,7 +11,6 @@ public partial class DayDetailViewModel : ObservableObject
 {
     private readonly DatabaseService _db;
     private DayEntry? _dayEntry;
-    private KetoneEntry? _ketoneEntry;
 
     [ObservableProperty]
     private string _dateLabel = string.Empty;
@@ -35,10 +34,10 @@ public partial class DayDetailViewModel : ObservableObject
     private bool _canAddMeal = true;
 
     [ObservableProperty]
-    private string _ketoneValueText = string.Empty;
+    private ObservableCollection<KetoneEntryViewModel> _ketones = new();
 
     [ObservableProperty]
-    private int _ketoneTimeIndex = 0;
+    private bool _canAddKetone = true;
 
     [ObservableProperty]
     private bool _isBusy;
@@ -83,13 +82,11 @@ public partial class DayDetailViewModel : ObservableObject
                 Meals.Add(new MealEntryViewModel(m));
             UpdateCanAddMeal();
 
-            _ketoneEntry = await _db.GetKetoneForDayAsync(_dayEntry.Id);
-            if (_ketoneEntry is not null)
-            {
-                KetoneValueText = _ketoneEntry.Value.ToString("0.##");
-                int totalMins = (int)_ketoneEntry.TimeOfDay.TotalMinutes;
-                KetoneTimeIndex = Math.Clamp(totalMins / 30, 0, TimeSlots.Count - 1);
-            }
+            var ketoneModels = await _db.GetKetonesForDayAsync(_dayEntry.Id);
+            Ketones.Clear();
+            foreach (var k in ketoneModels)
+                Ketones.Add(new KetoneEntryViewModel(k));
+            UpdateCanAddKetone();
         }
         finally
         {
@@ -138,6 +135,32 @@ public partial class DayDetailViewModel : ObservableObject
     private void UpdateCanAddMeal() => CanAddMeal = Meals.Count < 5;
 
     [RelayCommand]
+    private async Task AddKetone()
+    {
+        if (_dayEntry is null || Ketones.Count >= 5) return;
+
+        var model = new KetoneEntry
+        {
+            DayEntryId = _dayEntry.Id,
+            TimeOfDay = TimeSpan.Zero,
+            Value = 0
+        };
+        await _db.SaveKetoneAsync(model);
+        Ketones.Add(new KetoneEntryViewModel(model));
+        UpdateCanAddKetone();
+    }
+
+    [RelayCommand]
+    private async Task RemoveKetone(KetoneEntryViewModel ketone)
+    {
+        await _db.DeleteKetoneAsync(ketone.Model);
+        Ketones.Remove(ketone);
+        UpdateCanAddKetone();
+    }
+
+    private void UpdateCanAddKetone() => CanAddKetone = Ketones.Count < 5;
+
+    [RelayCommand]
     private async Task Save()
     {
         if (_dayEntry is null) return;
@@ -156,19 +179,20 @@ public partial class DayDetailViewModel : ObservableObject
                 await _db.SaveMealAsync(mealVm.Model);
             }
 
-            if (!string.IsNullOrWhiteSpace(KetoneValueText) && double.TryParse(KetoneValueText, out double kVal))
+            foreach (var ketoneVm in Ketones.ToList())
             {
-                _ketoneEntry ??= new KetoneEntry { DayEntryId = _dayEntry.Id };
-                _ketoneEntry.Value = kVal;
-                int totalMins = KetoneTimeIndex * 30;
-                _ketoneEntry.TimeOfDay = TimeSpan.FromMinutes(totalMins);
-                await _db.SaveKetoneAsync(_ketoneEntry);
+                if (!string.IsNullOrWhiteSpace(ketoneVm.ValueText) && double.TryParse(ketoneVm.ValueText, out _))
+                {
+                    ketoneVm.SyncToModel();
+                    await _db.SaveKetoneAsync(ketoneVm.Model);
+                }
+                else
+                {
+                    await _db.DeleteKetoneAsync(ketoneVm.Model);
+                    Ketones.Remove(ketoneVm);
+                }
             }
-            else if (_ketoneEntry is not null && string.IsNullOrWhiteSpace(KetoneValueText))
-            {
-                await _db.DeleteKetoneAsync(_ketoneEntry);
-                _ketoneEntry = null;
-            }
+            UpdateCanAddKetone();
 
             IsSaved = true;
             await Task.Delay(1500);

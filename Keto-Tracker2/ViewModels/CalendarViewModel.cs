@@ -28,6 +28,9 @@ public partial class CalendarViewModel : ObservableObject
     [ObservableProperty]
     private bool _hasWeightData;
 
+    [ObservableProperty]
+    private bool _hasAnyWeightData;
+
     private DateTime _currentMonth;
 
     public CalendarViewModel(DatabaseService db)
@@ -107,8 +110,12 @@ public partial class CalendarViewModel : ObservableObject
         KetoStreakDays = ComputeStreak(entryDict, today.AddDays(-1), e => e.KetoPass);
         OmadStreakDays = ComputeStreak(entryDict, today.AddDays(-1), e => e.OmadPass);
 
+        HasAnyWeightData = allEntries.Any(e => e.WeightKg.HasValue);
+
+        // Dashboard chart only shows a rolling 30-day window; full history lives on WeightTrendPage.
+        var chartFrom = today.AddDays(-29);
         var weightPoints = allEntries
-            .Where(e => e.WeightKg.HasValue)
+            .Where(e => e.WeightKg.HasValue && e.Date.Date >= chartFrom)
             .OrderBy(e => e.Date)
             .Select(e => (e.Date, e.WeightKg!.Value))
             .ToList();

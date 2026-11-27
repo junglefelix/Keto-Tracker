@@ -6,5 +6,6 @@ public partial class AppShell : Shell
     {
         InitializeComponent();
         Routing.RegisterRoute("DayDetailPage", typeof(Views.DayDetailPage));
+        Routing.RegisterRoute("WeightTrendPage", typeof(Views.WeightTrendPage));
     }
 }

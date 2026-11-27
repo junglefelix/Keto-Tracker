@@ -80,12 +80,13 @@ public class DatabaseService
         await _db!.DeleteAsync(meal);
     }
 
-    public async Task<KetoneEntry?> GetKetoneForDayAsync(int dayEntryId)
+    public async Task<List<KetoneEntry>> GetKetonesForDayAsync(int dayEntryId)
     {
         await InitAsync();
         return await _db!.Table<KetoneEntry>()
             .Where(k => k.DayEntryId == dayEntryId)
-            .FirstOrDefaultAsync();
+            .OrderBy(k => k.TimeOfDay)
+            .ToListAsync();
     }
 
     public async Task SaveKetoneAsync(KetoneEntry ketone)
@@ -114,6 +115,15 @@ public class DatabaseService
             .ToListAsync();
     }
 
+    public async Task<List<DayEntry>> GetAllWeightEntriesAsync()
+    {
+        await InitAsync();
+        return await _db!.Table<DayEntry>()
+            .Where(d => d.WeightKg != null)
+            .OrderBy(d => d.Date)
+            .ToListAsync();
+    }
+
     // ── Bulk operations for import/export ──────────────────────────────────
 
     public async Task<KetoTrackerData> GetAllDataAsync()
@@ -130,9 +140,10 @@ public class DatabaseService
                 .OrderBy(m => m.TimeOfDay)
                 .ToListAsync();
 
-            var ketone = await _db.Table<KetoneEntry>()
+            var ketones = await _db.Table<KetoneEntry>()
                 .Where(k => k.DayEntryId == day.Id)
-                .FirstOrDefaultAsync();
+                .OrderBy(k => k.TimeOfDay)
+                .ToListAsync();
 
             var record = new DayRecord
             {
@@ -146,11 +157,11 @@ public class DatabaseService
                     TimeOfDay = m.TimeOfDay,
                     Description = m.Description
                 }).ToList(),
-                Ketone = ketone is null ? null : new KetoneRecord
+                Ketones = ketones.Select(k => new KetoneRecord
                 {
-                    Value = ketone.Value,
-                    TimeOfDay = ketone.TimeOfDay
-                }
+                    Value = k.Value,
+                    TimeOfDay = k.TimeOfDay
+                }).ToList()
             };
 
             data.Days.Add(record);
@@ -210,20 +221,25 @@ public class DatabaseService
                 });
             }
 
-            // Replace ketone: delete existing, insert from record
+            // Replace ketones: delete existing, insert from record
             var existingKetones = await _db.Table<KetoneEntry>()
                 .Where(k => k.DayEntryId == dayEntry.Id)
                 .ToListAsync();
             foreach (var k in existingKetones)
                 await _db.DeleteAsync(k);
 
-            if (record.Ketone is not null)
+            // Older export files only have the singular "Ketone" field; newer ones use "Ketones".
+            var ketoneRecords = new List<KetoneRecord>(record.Ketones);
+            if (record.Ketone is not null && ketoneRecords.Count == 0)
+                ketoneRecords.Add(record.Ketone);
+
+            foreach (var ketoneRecord in ketoneRecords)
             {
                 await _db.InsertAsync(new KetoneEntry
                 {
                     DayEntryId = dayEntry.Id,
-                    Value = record.Ketone.Value,
-                    TimeOfDay = record.Ketone.TimeOfDay
+                    Value = ketoneRecord.Value,
+                    TimeOfDay = ketoneRecord.TimeOfDay
                 });
             }
         }

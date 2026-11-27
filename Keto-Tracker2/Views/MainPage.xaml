@@ -189,6 +189,9 @@
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="12" />
                     </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnWeightChartTapped" />
+                    </Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Weight Trend"
                                TextColor="#9E9EC8"
@@ -202,6 +205,11 @@
                                FontSize="13"
                                HorizontalOptions="Center"
                                IsVisible="{Binding HasWeightData, Converter={StaticResource InverseBool}}" />
+                        <Label Text="Tap to view full history &#x203A;"
+                               TextColor="#555570"
+                               FontSize="11"
+                               HorizontalOptions="Center"
+                               IsVisible="{Binding HasAnyWeightData}" />
                     </VerticalStackLayout>
                 </Border>
 
