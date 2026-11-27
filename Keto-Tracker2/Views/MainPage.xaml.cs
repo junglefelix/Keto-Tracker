@@ -3,7 +3,7 @@ using Keto_Tracker2.ViewModels;
 
 namespace Keto_Tracker2.Views;
 
-public partial class MainPage : ContentPage
+public partial class MainPage : ContentPage, ISwipeNavigable
 {
     private readonly CalendarViewModel _viewModel;
     private readonly ImportExportService _importExport;
@@ -14,6 +14,7 @@ public partial class MainPage : ContentPage
         _viewModel = viewModel;
         _importExport = importExport;
         BindingContext = viewModel;
+        SwipeNavigation.Attach(RootGrid, this);
     }
 
     protected override async void OnAppearing()
@@ -36,14 +37,17 @@ public partial class MainPage : ContentPage
         await Shell.Current.GoToAsync("WeightTrendPage");
     }
 
-    private void OnSwipedLeft(object sender, SwipedEventArgs e)
+    // Swipe left = next month, swipe right = previous month (arrows keep working too).
+    public void OnSwipeLeft()
     {
-        _viewModel.NextMonthCommand.Execute(null);
+        if (_viewModel.NextMonthCommand.CanExecute(null))
+            _viewModel.NextMonthCommand.Execute(null);
     }
 
-    private void OnSwipedRight(object sender, SwipedEventArgs e)
+    public void OnSwipeRight()
     {
-        _viewModel.PrevMonthCommand.Execute(null);
+        if (_viewModel.PrevMonthCommand.CanExecute(null))
+            _viewModel.PrevMonthCommand.Execute(null);
     }
 
     private async void OnMenuClicked(object sender, EventArgs e)

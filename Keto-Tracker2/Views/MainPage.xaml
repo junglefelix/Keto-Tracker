@@ -20,11 +20,8 @@
         <conv:InverseBoolConverter x:Key="InverseBool" />
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,*">
-        <Grid.GestureRecognizers>
-            <SwipeGestureRecognizer Direction="Left"  Swiped="OnSwipedLeft" />
-            <SwipeGestureRecognizer Direction="Right" Swiped="OnSwipedRight" />
-        </Grid.GestureRecognizers>
+    <!-- Swipe left/right anywhere changes month: see MainPage.OnSwipeLeft/OnSwipeRight -->
+    <Grid x:Name="RootGrid" RowDefinitions="Auto,*">
 
         <!-- Header: Month Navigation -->
         <Grid Grid.Row="0" Padding="16,12" ColumnDefinitions="Auto,*,Auto" BackgroundColor="#2D2D44">
@@ -196,9 +193,11 @@
                         <Label Text="Weight Trend"
                                TextColor="#9E9EC8"
                                FontSize="12" />
+                        <!-- InputTransparent: let taps on the chart reach the card's TapGestureRecognizer -->
                         <GraphicsView
                             Drawable="{Binding WeightChart}"
                             HeightRequest="110"
+                            InputTransparent="True"
                             IsVisible="{Binding HasWeightData}" />
                         <Label Text="No weight data recorded yet"
                                TextColor="#555570"

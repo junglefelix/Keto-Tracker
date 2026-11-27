@@ -121,7 +121,12 @@ public partial class CalendarViewModel : ObservableObject
             .ToList();
 
         HasWeightData = weightPoints.Count > 0;
-        WeightChart = new WeightChartDrawable { Points = weightPoints };
+        WeightChart = new WeightChartDrawable
+        {
+            Points = weightPoints,
+            RangeStart = chartFrom,
+            RangeEnd = today
+        };
     }
 
     private static int ComputeStreak(

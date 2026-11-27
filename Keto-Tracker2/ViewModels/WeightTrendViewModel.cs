@@ -59,14 +59,24 @@ public partial class WeightTrendViewModel : ObservableObject
     private void ApplyRange()
     {
         var today = DateTime.Today;
-        var filtered = SelectedRange switch
+        DateTime? from = SelectedRange switch
         {
-            "30D" => _allPoints.Where(p => p.Date.Date >= today.AddDays(-29)).ToList(),
-            "90D" => _allPoints.Where(p => p.Date.Date >= today.AddDays(-89)).ToList(),
-            "1Y" => _allPoints.Where(p => p.Date.Date >= today.AddDays(-364)).ToList(),
-            _ => _allPoints
+            "30D" => today.AddDays(-29),
+            "90D" => today.AddDays(-89),
+            "1Y" => today.AddDays(-364),
+            _ => null
         };
 
-        Chart = new WeightChartDrawable { Points = filtered };
+        var filtered = from is null
+            ? _allPoints
+            : _allPoints.Where(p => p.Date.Date >= from.Value).ToList();
+
+        // Fixed windows span the whole period up to today; "All" spans first to last entry.
+        Chart = new WeightChartDrawable
+        {
+            Points = filtered,
+            RangeStart = from,
+            RangeEnd = from is null ? null : today
+        };
     }
 }
