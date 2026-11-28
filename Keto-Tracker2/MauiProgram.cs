@@ -21,6 +21,7 @@ public static class MauiProgram
         // Services
         builder.Services.AddSingleton<DatabaseService>();
         builder.Services.AddSingleton<ImportExportService>();
+        builder.Services.AddSingleton<SpeechInputService>();
 
         // ViewModels
         builder.Services.AddSingleton<CalendarViewModel>();

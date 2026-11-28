@@ -124,6 +124,23 @@ public class DatabaseService
             .ToListAsync();
     }
 
+    /// <summary>Saves what was understood from a voice phrase into the given day.</summary>
+    public async Task ApplyVoiceCommandAsync(VoiceCommand cmd)
+    {
+        await InitAsync();
+        var day = await GetOrCreateDayEntryAsync(cmd.Date);
+        if (cmd.WeightKg is double w) day.WeightKg = w;
+        if (cmd.KetoPass is bool keto) day.KetoPass = keto;
+        if (cmd.OmadPass is bool omad) day.OmadPass = omad;
+        await SaveDayEntryAsync(day);
+
+        foreach (var (time, description) in cmd.Meals)
+            await SaveMealAsync(new MealEntry { DayEntryId = day.Id, TimeOfDay = time, Description = description });
+
+        foreach (var (time, value) in cmd.Ketones)
+            await SaveKetoneAsync(new KetoneEntry { DayEntryId = day.Id, TimeOfDay = time, Value = value });
+    }
+
     // ── Bulk operations for import/export ──────────────────────────────────
 
     public async Task<KetoTrackerData> GetAllDataAsync()
