@@ -51,7 +51,8 @@
         </Grid>
 
         <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="8,8">
+            <!-- Extra bottom padding so the microphone button never covers the chart -->
+            <VerticalStackLayout Padding="8,8,8,88">
 
                 <!-- Day of week headers -->
                 <Grid ColumnDefinitions="*,*,*,*,*,*,*" Margin="0,0,0,4">
@@ -214,5 +215,22 @@
 
             </VerticalStackLayout>
         </ScrollView>
+
+        <!-- Voice input: say "вешу 90", "в 15:00 ел печёнку", "кетоны 1.2", "кето ок"... -->
+        <Button x:Name="VoiceButton"
+                Grid.Row="1"
+                Text="&#x1F3A4;"
+                FontSize="26"
+                WidthRequest="64"
+                HeightRequest="64"
+                CornerRadius="32"
+                Padding="0"
+                BackgroundColor="#7C4DFF"
+                TextColor="White"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="0,0,20,20"
+                SemanticProperties.Description="Голосовой ввод"
+                Clicked="OnVoiceClicked" />
     </Grid>
 </ContentPage>
